@@ -1,13 +1,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { JwtService } from '../Services/jwt.service';
 import { AdminService } from '../Services/admin.service';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
@@ -42,20 +42,51 @@ export class Admin implements OnInit {
   notificationMessage = signal('');
   notificationType = signal<'success' | 'error'>('success');
   
+  // Reactive Forms
+  agentForm: FormGroup;
+  updateForm: FormGroup;
+  policyForm: FormGroup;
+  searchForm: FormGroup;
 
-  agentForm = signal({
-    name: '', contactInfo: '', password: '', gender: 'male',
-    aadharnumber: null, phone: null, address: '', role: 'AGENT', orgEmail: ''
-  });
-  updateForm = signal({
-    name: '', contactInfo: '', gender: 'male', date: '',
-    aadharnumber: null, phone: null, address: '', orgEmail: ''
-  });
-  policyForm = signal({
-    name: '', policyType: '', premiumAmount: null, coverageamount: null, coverageDetails: ''
-  });
+  constructor(
+    private jwtService: JwtService, 
+    private adminService: AdminService,
+    private fb: FormBuilder
+  ) {
+    this.agentForm = this.fb.group({
+      name: ['', Validators.required],
+      contactInfo: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      gender: ['male', Validators.required],
+      aadharnumber: ['', [Validators.required, Validators.pattern('^[0-9]{12}$')]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      address: ['', Validators.required],
+      orgEmail: ['', [Validators.required, Validators.email]]
+    });
 
-  constructor(private jwtService: JwtService, private adminService: AdminService) {}
+    this.updateForm = this.fb.group({
+      name: ['', Validators.required],
+      contactInfo: ['', [Validators.required, Validators.email]],
+      gender: ['male', Validators.required],
+      date: ['', Validators.required],
+      aadharnumber: ['', [Validators.required, Validators.pattern('^[0-9]{12}$')]],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      address: ['', Validators.required],
+      orgEmail: ['', [Validators.required, Validators.email]]
+    });
+
+    this.policyForm = this.fb.group({
+      name: ['', Validators.required],
+      policyType: ['', Validators.required],
+      premiumAmount: ['', [Validators.required, Validators.min(1)]],
+      coverageamount: ['', [Validators.required, Validators.min(1)]],
+      coverageDetails: ['', Validators.required]
+    });
+
+    this.searchForm = this.fb.group({
+      searchTerm: ['']
+    });
+  }
 
   ngOnInit() {
     this.loadUserData();
@@ -112,11 +143,17 @@ export class Admin implements OnInit {
   }
 
   createAgent() {
-    const form = this.agentForm();
+    if (this.agentForm.invalid) {
+      this.showNotificationMessage('Please fill all required fields correctly', 'error');
+      this.agentForm.markAllAsTouched();
+      return;
+    }
+
+    const formValue = this.agentForm.value;
     
     // Check for duplicate contact info
     const existingContactInfo = this.agents().find(agent => 
-      agent.contactInfo === form.contactInfo || agent.email === form.contactInfo
+      agent.contactInfo === formValue.contactInfo || agent.email === formValue.contactInfo
     );
     
     if (existingContactInfo) {
@@ -126,7 +163,7 @@ export class Admin implements OnInit {
     
     // Check for duplicate organizational email
     const existingOrgEmail = this.agents().find(agent => 
-      agent.orgEmail === form.orgEmail
+      agent.orgEmail === formValue.orgEmail
     );
     
     if (existingOrgEmail) {
@@ -135,20 +172,20 @@ export class Admin implements OnInit {
     }
     
     const agentData = {
-      ...form,
+      ...formValue,
+      role: 'AGENT',
       date: new Date().toISOString()
     };
     
     this.adminService.createAgent(agentData).subscribe({
       next: () => {
         this.showNotificationMessage('Agent created successfully!', 'success');
-        // Only reload agents data for faster response
         this.adminService.getAllAgents().subscribe({
           next: data => this.agents.set(data || []),
           error: () => this.agents.set([])
         });
         this.showAgentForm.set(false);
-        this.resetAgentForm();
+        this.agentForm.reset();
       },
       error: (error) => {
         console.error('Create agent error:', error);
@@ -159,13 +196,13 @@ export class Admin implements OnInit {
 
   openUpdateForm(agent: any) {
     this.selectedAgent.set(agent);
-    this.updateForm.set({
+    this.updateForm.patchValue({
       name: agent.name || '',
       contactInfo: agent.contactInfo || agent.email || '',
       gender: agent.gender || 'male',
       date: agent.date || '',
-      aadharnumber: agent.aadharnumber || null,
-      phone: agent.phone || null,
+      aadharnumber: agent.aadharnumber || '',
+      phone: agent.phone || '',
       address: agent.address || '',
       orgEmail: agent.orgEmail || ''
     });
@@ -173,13 +210,19 @@ export class Admin implements OnInit {
   }
 
   updateAgent() {
+    if (this.updateForm.invalid) {
+      this.showNotificationMessage('Please fill all required fields correctly', 'error');
+      this.updateForm.markAllAsTouched();
+      return;
+    }
+
     const agentId = this.selectedAgent()?.agentId || this.selectedAgent()?.id;
     if (!agentId) {
       this.showNotificationMessage('Agent ID not found', 'error');
       return;
     }
 
-    this.adminService.updateAgent(agentId, this.updateForm()).subscribe({
+    this.adminService.updateAgent(agentId, this.updateForm.value).subscribe({
       next: () => {
         this.showNotificationMessage('Agent updated successfully!', 'success');
         this.adminService.getAllAgents().subscribe({
@@ -200,12 +243,7 @@ export class Admin implements OnInit {
     this.selectedAgent.set(null);
   }
 
-  resetAgentForm() {
-    this.agentForm.set({
-      name: '', contactInfo: '', password: '', gender: 'male',
-      aadharnumber: null, phone: null, address: '', role: 'AGENT', orgEmail: ''
-    });
-  }
+
 
   // Policy methods
   togglePolicyForm() {
@@ -213,32 +251,29 @@ export class Admin implements OnInit {
   }
 
   createPolicy() {
-    const form = this.policyForm();
-    
-    // Validation
-    if (!form.name || !form.policyType || !form.premiumAmount || !form.coverageamount || !form.coverageDetails) {
-      this.showNotificationMessage('Please fill all required fields', 'error');
+    if (this.policyForm.invalid) {
+      this.showNotificationMessage('Please fill all required fields correctly', 'error');
+      this.policyForm.markAllAsTouched();
       return;
     }
     
-    // Convert to exact backend format
+    const formValue = this.policyForm.value;
     const policyData = {
-      name: form.name,
-      policyType: form.policyType,
-      premiumAmount: Number(form.premiumAmount),
-      coverageamount: Number(form.coverageamount),
-      coverageDetails: form.coverageDetails
+      name: formValue.name,
+      policyType: formValue.policyType,
+      premiumAmount: Number(formValue.premiumAmount),
+      coverageamount: Number(formValue.coverageamount),
+      coverageDetails: formValue.coverageDetails
     };
     
     this.adminService.createPolicyList(policyData).subscribe(() => {
       this.showNotificationMessage('Policy created successfully!', 'success');
-      // Only reload policies data for faster response
       this.adminService.getAllPolicyList().subscribe({
         next: data => this.policies.set(data || []),
         error: () => this.policies.set([])
       });
       this.showPolicyForm.set(false);
-      this.resetPolicyForm();
+      this.policyForm.reset();
     });
   }
 
@@ -259,22 +294,9 @@ export class Admin implements OnInit {
     }
   }
 
-  resetPolicyForm() {
-    this.policyForm.set({
-      name: '', policyType: '', premiumAmount: null, coverageamount: null, coverageDetails: ''
-    });
-  }
 
-  updatePolicyForm(field: string, value: any) {
-    let processedValue = value;
-    
-    // Convert numeric fields to numbers
-    if (field === 'premiumAmount' || field === 'coverageamount') {
-      processedValue = value ? Number(value) : null;
-    }
-    
-    this.policyForm.update(form => ({ ...form, [field]: processedValue }));
-  }
+
+
 
   getFilteredPolicies() {
     if (!this.selectedPolicyType()) return this.policies();
@@ -283,28 +305,26 @@ export class Admin implements OnInit {
     );
   }
 
-  updateAgentForm(field: string, value: any) {
-    this.agentForm.update(form => ({ ...form, [field]: value }));
-  }
-
-  updateFormField(field: string, value: any) {
-    this.updateForm.update(form => ({ ...form, [field]: value }));
-  }
-
-  onUpdateInputChange(event: Event, field: string) {
-    const target = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    this.updateFormField(field, target.value);
-  }
-
-  onInputChange(event: Event, field: string) {
-    const target = event.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    this.updateAgentForm(field, target.value);
+  getFieldError(form: FormGroup, fieldName: string): string {
+    const field = form.get(fieldName);
+    if (field?.errors && field.touched) {
+      if (field.errors['required']) return `${fieldName} is required`;
+      if (field.errors['email']) return 'Please enter a valid email';
+      if (field.errors['minlength']) return `Minimum ${field.errors['minlength'].requiredLength} characters required`;
+      if (field.errors['pattern']) {
+        if (fieldName === 'phone') return 'Enter valid 10-digit phone number';
+        if (fieldName === 'aadharnumber') return 'Enter valid 12-digit Aadhaar number';
+      }
+      if (field.errors['min']) return 'Value must be greater than 0';
+    }
+    return '';
   }
 
   getFilteredAgents() {
-    if (!this.searchTerm()) return this.agents();
+    const searchValue = this.searchForm.get('searchTerm')?.value || '';
+    if (!searchValue) return this.agents();
     return this.agents().filter(agent => 
-      agent.name?.toLowerCase().includes(this.searchTerm().toLowerCase())
+      agent.name?.toLowerCase().includes(searchValue.toLowerCase())
     );
   }
 

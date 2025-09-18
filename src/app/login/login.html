@@ -42,7 +42,7 @@
             <p>Sign in to your SecureLife Insurance account</p>
           </div>
 
-          <form *ngIf="showForm" (ngSubmit)="onLogin()" #loginForm="ngForm">
+          <form *ngIf="showForm" [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <div class="form-group">
               <label for="email">
                 <i class="fas fa-envelope"></i>
@@ -51,16 +51,12 @@
               <input 
                 type="email" 
                 id="email" 
-                name="email"
-                [(ngModel)]="email"
+                formControlName="email"
                 [placeholder]="loginType === 'agent' ? 'Enter your agent email' : 'Enter your customer email'"
-                required
-                email
-                #emailInput="ngModel"
+                [class.error]="getFieldError('email')"
               >
-              <div class="error-message" *ngIf="emailInput.invalid && emailInput.touched">
-                <span *ngIf="emailInput.errors?.['required']">Email is required</span>
-                <span *ngIf="emailInput.errors?.['email']">Please enter a valid email</span>
+              <div class="error-message" *ngIf="getFieldError('email')">
+                {{getFieldError('email')}}
               </div>
             </div>
 
@@ -73,20 +69,16 @@
                 <input 
                   [type]="showPassword ? 'text' : 'password'"
                   id="password" 
-                  name="password"
-                  [(ngModel)]="password"
+                  formControlName="password"
                   [placeholder]="loginType === 'agent' ? 'Enter your agent password' : 'Enter your customer password'"
-                  required
-                  minlength="6"
-                  #passwordInput="ngModel"
+                  [class.error]="getFieldError('password')"
                 >
                 <button type="button" class="password-toggle" (click)="togglePassword()">
                   <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                 </button>
               </div>
-              <div class="error-message" *ngIf="passwordInput.invalid && passwordInput.touched">
-                <span *ngIf="passwordInput.errors?.['required']">Password is required</span>
-                <span *ngIf="passwordInput.errors?.['minlength']">Password must be at least 6 characters</span>
+              <div class="error-message" *ngIf="getFieldError('password')">
+                {{getFieldError('password')}}
               </div>
             </div>
 

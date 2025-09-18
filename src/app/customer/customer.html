@@ -63,7 +63,7 @@
       <div class="navbar-center">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search policies..." [(ngModel)]="searchTerm" />
+          <input type="text" placeholder="Search policies..." formControlName="searchTerm" [formGroup]="searchForm" />
         </div>
       </div>
 
