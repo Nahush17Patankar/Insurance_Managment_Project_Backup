@@ -1,0 +1,143 @@
+<div class="login-container">
+  <!-- Notification -->
+  <div class="notification" [class.show]="showNotification" [class.success]="notificationType === 'success'" [class.error]="notificationType === 'error'">
+    <div class="notification-content">
+      <i class="fas fa-check-circle" *ngIf="notificationType === 'success'"></i>
+      <i class="fas fa-exclamation-circle" *ngIf="notificationType === 'error'"></i>
+      <span>{{notificationMessage}}</span>
+    </div>
+  </div>
+  
+  <div class="login-wrapper">
+    <!-- Header -->
+    <header class="login-header">
+      <div class="brand" (click)="navigateToHome()">
+        <i class="fas fa-shield-alt"></i>
+        <span>SecureLife Insurance</span>
+      </div>
+    </header>
+
+    <!-- Login Form -->
+    <div class="login-content">
+      <div class="login-form-container">
+        <div class="login-form">
+          <div class="form-header">
+            <div class="redirect-buttons">
+              <button 
+                type="button" 
+                class="redirect-btn customer-redirect" 
+                (click)="goToCustomerLogin()">
+                <i class="fas fa-user"></i>
+                Customer Login
+              </button>
+              <button 
+                type="button" 
+                class="redirect-btn agent-redirect" 
+                (click)="goToAgentLogin()">
+                <i class="fas fa-user-tie"></i>
+                Agent Login
+              </button>
+            </div>
+            <h1>Welcome Back</h1>
+            <p>Sign in to your SecureLife Insurance account</p>
+          </div>
+
+          <form *ngIf="showForm" (ngSubmit)="onLogin()" #loginForm="ngForm">
+            <div class="form-group">
+              <label for="email">
+                <i class="fas fa-envelope"></i>
+                {{ loginType === 'agent' ? 'Agent Email' : 'Customer Email' }}
+              </label>
+              <input 
+                type="email" 
+                id="email" 
+                name="email"
+                [(ngModel)]="email"
+                [placeholder]="loginType === 'agent' ? 'Enter your agent email' : 'Enter your customer email'"
+                required
+                email
+                #emailInput="ngModel"
+              >
+              <div class="error-message" *ngIf="emailInput.invalid && emailInput.touched">
+                <span *ngIf="emailInput.errors?.['required']">Email is required</span>
+                <span *ngIf="emailInput.errors?.['email']">Please enter a valid email</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password">
+                <i class="fas fa-lock"></i>
+                {{ loginType === 'agent' ? 'Agent Password' : 'Customer Password' }}
+              </label>
+              <div class="password-input">
+                <input 
+                  [type]="showPassword ? 'text' : 'password'"
+                  id="password" 
+                  name="password"
+                  [(ngModel)]="password"
+                  [placeholder]="loginType === 'agent' ? 'Enter your agent password' : 'Enter your customer password'"
+                  required
+                  minlength="6"
+                  #passwordInput="ngModel"
+                >
+                <button type="button" class="password-toggle" (click)="togglePassword()">
+                  <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
+              <div class="error-message" *ngIf="passwordInput.invalid && passwordInput.touched">
+                <span *ngIf="passwordInput.errors?.['required']">Password is required</span>
+                <span *ngIf="passwordInput.errors?.['minlength']">Password must be at least 6 characters</span>
+              </div>
+            </div>
+
+            <div class="form-options">
+              <label class="checkbox-container">
+                <input type="checkbox">
+                <span class="checkmark"></span>
+                Remember me
+              </label>
+              <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button 
+              type="submit" 
+              class="login-btn"
+              [disabled]="loginForm.invalid || isLoading"
+            >
+              <i [class]="isLoading ? 'fas fa-spinner fa-spin' : 'fas fa-sign-in-alt'"></i>
+              {{ isLoading ? 'Signing In...' : 'Sign In as ' + (loginType === 'agent' ? 'Agent' : 'Customer') }}
+            </button>
+          </form>
+
+          <div class="signup-link">
+            <p>Don't have an account? <a (click)="navigateToSignup()">Sign up here</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="login-image">
+        <div class="image-content">
+          <div class="security-icon">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <h2>Secure & Trusted</h2>
+          <p>Your data is protected with enterprise-grade security. Login safely to access your insurance dashboard.</p>
+          <div class="features">
+            <div class="feature">
+              <i class="fas fa-check-circle"></i>
+              <span>256-bit SSL Encryption</span>
+            </div>
+            <div class="feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Two-Factor Authentication</span>
+            </div>
+            <div class="feature">
+              <i class="fas fa-check-circle"></i>
+              <span>24/7 Account Monitoring</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

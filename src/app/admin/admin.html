@@ -1,0 +1,588 @@
+<div class="admin-dashboard">
+  <!-- Notification -->
+  <div class="notification" [class.show]="showNotification()" [class.success]="notificationType() === 'success'" [class.error]="notificationType() === 'error'">
+    <div class="notification-content">
+      <i class="fas fa-check-circle" *ngIf="notificationType() === 'success'"></i>
+      <i class="fas fa-exclamation-circle" *ngIf="notificationType() === 'error'"></i>
+      <span>{{ notificationMessage() }}</span>
+    </div>
+  </div>
+  
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <i class="fas fa-shield-alt"></i>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li [class.active]="activeTab() === 'dashboard'" (click)="setActiveTab('dashboard')">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </li>
+        <li [class.active]="activeTab() === 'agents'" (click)="setActiveTab('agents')">
+          <i class="fas fa-users"></i>
+          <span>Agents</span>
+        </li>
+        <li [class.active]="activeTab() === 'policies'" (click)="setActiveTab('policies')">
+          <i class="fas fa-file-contract"></i>
+          <span>Policies</span>
+        </li>
+        <li [class.active]="activeTab() === 'claims'" (click)="setActiveTab('claims')">
+          <i class="fas fa-file-medical"></i>
+          <span>Claims</span>
+        </li>
+        <li [class.active]="activeTab() === 'customers'" (click)="setActiveTab('customers')">
+          <i class="fas fa-user-friends"></i>
+          <span>Customers</span>
+        </li>
+        <li [class.active]="activeTab() === 'policy-logs'" (click)="setActiveTab('policy-logs')">
+          <i class="fas fa-history"></i>
+          <span>Policy Logs</span>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Navbar -->
+    <header class="top-navbar">
+      <div class="navbar-left">
+        <div class="user-avatar">{{adminInitials()}}</div>
+        <span class="user-name">{{adminName()}}</span>
+      </div>
+      
+      <div class="navbar-center">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search..." [(ngModel)]="searchTerm">
+        </div>
+      </div>
+      
+      <div class="navbar-right">
+        <button class="logout-btn" (click)="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+      <!-- Dashboard Section -->
+      <div *ngIf="activeTab() === 'dashboard'" class="section">
+        <div class="section-header">
+          <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+          <p>Overview of system statistics and metrics</p>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card agents-card" (click)="setActiveTab('agents')">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{agents().length}}</h3>
+              <p><i class="fas fa-user-tie"></i> Total Agents</p>
+
+            </div>
+            <div class="card-action">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </div>
+          <div class="stat-card policies-card" (click)="setActiveTab('policies')">
+            <div class="stat-icon">
+              <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{policies().length}}</h3>
+              <p><i class="fas fa-shield-alt"></i> Total Policies</p>
+
+            </div>
+            <div class="card-action">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </div>
+          <div class="stat-card claims-card" (click)="setActiveTab('claims')">
+            <div class="stat-icon">
+              <i class="fas fa-file-medical"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{claims().length}}</h3>
+              <p><i class="fas fa-clipboard-list"></i> Total Claims</p>
+
+            </div>
+            <div class="card-action">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </div>
+          <div class="stat-card customers-card" (click)="setActiveTab('customers')">
+            <div class="stat-icon">
+              <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{customers().length}}</h3>
+              <p><i class="fas fa-users"></i> Total Customers</p>
+
+            </div>
+            <div class="card-action">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </div>
+          <div class="stat-card logs-card" (click)="setActiveTab('policy-logs')">
+            <div class="stat-icon">
+              <i class="fas fa-history"></i>
+            </div>
+            <div class="stat-info">
+              <h3>{{policyLogs().length}}</h3>
+              <p><i class="fas fa-clipboard-check"></i> Policy Logs</p>
+
+            </div>
+            <div class="card-action">
+              <i class="fas fa-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+          <div class="actions-grid">
+            <button class="action-btn" (click)="setActiveTab('agents'); toggleAgentForm()">
+              <i class="fas fa-user-plus"></i>
+              <span>Add Agent</span>
+            </button>
+            <button class="action-btn" (click)="setActiveTab('policies'); togglePolicyForm()">
+              <i class="fas fa-plus-circle"></i>
+              <span>Create Policy</span>
+            </button>
+            <button class="action-btn" (click)="setActiveTab('claims')">
+              <i class="fas fa-file-medical-alt"></i>
+              <span>View Claims</span>
+            </button>
+            <button class="action-btn" (click)="setActiveTab('customers')">
+              <i class="fas fa-users-cog"></i>
+              <span>Manage Customers</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Recent Activity
+        <div class="recent-activity">
+          <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon agents">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <div class="activity-content">
+                <p><strong>New Agent Registered</strong></p>
+                <span>{{agents().length > 0 ? 'Latest: ' + (agents()[agents().length-1]?.name || 'Unknown') : 'No agents yet'}}</span>
+              </div>
+              <div class="activity-time">Today</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon policies">
+                <i class="fas fa-file-contract"></i>
+              </div>
+              <div class="activity-content">
+                <p><strong>Policy Created</strong></p>
+                <span>{{policies().length > 0 ? 'Latest policy added' : 'No policies yet'}}</span>
+              </div>
+              <div class="activity-time">2 hours ago</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon claims">
+                <i class="fas fa-file-medical"></i>
+              </div>
+              <div class="activity-content">
+                <p><strong>Claim Processed</strong></p>
+                <span>{{claims().length > 0 ? 'Total claims: ' + claims().length : 'No claims yet'}}</span>
+              </div>
+              <div class="activity-time">5 hours ago</div>
+            </div>
+          </div>
+        </div> -->
+      </div>
+
+      <!-- Agents Section -->
+      <div *ngIf="activeTab() === 'agents'" class="section">
+        <div class="section-header">
+          <h2>Agents Management</h2>
+          <button class="btn-primary" (click)="toggleAgentForm()">
+            <i class="fas fa-plus"></i>
+            Add Agent
+          </button>
+        </div>
+
+        <!-- Agent Form -->
+        <div *ngIf="showAgentForm()" class="form-card">
+          <div class="form-header">
+            <h3>Create New Agent</h3>
+            <button class="close-btn" (click)="toggleAgentForm()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <form (ngSubmit)="createAgent()" class="agent-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Name</label>
+                <input [value]="agentForm().name" (input)="onInputChange($event, 'name')" placeholder="Agent Name" required>
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input [value]="agentForm().contactInfo" (input)="onInputChange($event, 'contactInfo')" type="email" placeholder="Email" required>
+              </div>
+              <div class="form-group">
+                <label>Password</label>
+                <input [value]="agentForm().password" (input)="onInputChange($event, 'password')" type="password" placeholder="Password" required>
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select [value]="agentForm().gender" (change)="onInputChange($event, 'gender')">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Aadhar Number</label>
+                <input [value]="agentForm().aadharnumber" (input)="onInputChange($event, 'aadharnumber')" type="number" placeholder="Aadhar Number" required>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input [value]="agentForm().phone" (input)="onInputChange($event, 'phone')" type="number" placeholder="Phone Number" required>
+              </div>
+              <div class="form-group">
+                <label>Organization Email</label>
+                <input [value]="agentForm().orgEmail" (input)="onInputChange($event, 'orgEmail')" type="email" placeholder="Organization Email" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Address</label>
+              <textarea [value]="agentForm().address" (input)="onInputChange($event, 'address')" placeholder="Address" required></textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-outline" (click)="toggleAgentForm()">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i>
+                Create Agent
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Update Agent Form -->
+        <div *ngIf="showUpdateForm()" class="form-card">
+          <div class="form-header">
+            <h3>Update Agent</h3>
+            <button class="close-btn" (click)="closeUpdateForm()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <form (ngSubmit)="updateAgent()" class="agent-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Name</label>
+                <input [value]="updateForm().name" (input)="onUpdateInputChange($event, 'name')" placeholder="Agent Name" required>
+              </div>
+              <div class="form-group">
+                <label>Contact Info</label>
+                <input [value]="updateForm().contactInfo" (input)="onUpdateInputChange($event, 'contactInfo')" type="email" placeholder="Contact Info" required>
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select [value]="updateForm().gender" (change)="onUpdateInputChange($event, 'gender')">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Date</label>
+                <input [value]="updateForm().date" (input)="onUpdateInputChange($event, 'date')" type="datetime-local" required>
+              </div>
+              <div class="form-group">
+                <label>Aadhar Number</label>
+                <input [value]="updateForm().aadharnumber" (input)="onUpdateInputChange($event, 'aadharnumber')" type="number" placeholder="Aadhar Number" required>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input [value]="updateForm().phone" (input)="onUpdateInputChange($event, 'phone')" type="number" placeholder="Phone Number" required>
+              </div>
+              <div class="form-group">
+                <label>Organization Email</label>
+                <input [value]="updateForm().orgEmail" (input)="onUpdateInputChange($event, 'orgEmail')" type="email" placeholder="Organization Email" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Address</label>
+              <textarea [value]="updateForm().address" (input)="onUpdateInputChange($event, 'address')" placeholder="Address" required></textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-outline" (click)="closeUpdateForm()">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i>
+                Update Agent
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Agents Table -->
+        <div class="table-card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let agent of getFilteredAgents()">
+                  <td>{{agent.agentId || agent.id}}</td>
+                  <td>{{agent.name}}</td>
+                  <td>{{agent.contactInfo || agent.email}}</td>
+                  <td>{{agent.phone}}</td>
+                  <td>
+                    <button class="btn-primary btn-sm" (click)="openUpdateForm(agent)">
+                      <i class="fas fa-edit"></i>
+                      Update
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Claims Section -->
+      <div *ngIf="activeTab() === 'claims'" class="section">
+        <div class="section-header">
+          <h2>Claims Management</h2>
+          <p>Monitor and manage insurance claims</p>
+        </div>
+        
+        <div class="table-card">
+          <div class="table-container">
+            <div *ngIf="claims().length === 0" class="no-data-message">
+              <i class="fas fa-file-medical"></i>
+              <p>No claims data available</p>
+            </div>
+            <table *ngIf="claims().length > 0" class="data-table">
+              <thead>
+                <tr>
+                  <th>Claim ID</th>
+                  <th>Policy ID</th>
+                  <th>Customer ID</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let claim of claims()">
+                  <td><span class="id-badge">{{claim.claimId || claim.claim_id || claim.id || 'N/A'}}</span></td>
+                  <td><span class="id-badge">{{claim.policyId || claim.policy_id || 'N/A'}}</span></td>
+                  <td><span class="id-badge">{{claim.customerId || claim.customer_id || claim.userId || 'N/A'}}</span></td>
+                  <td><span class="amount">₹{{(claim.claimAmount || claim.claim_amount || claim.amount || 0) | number}}</span></td>
+                  <td>
+                    <span class="status-badge" [class]="'status-' + (claim.status || 'pending').toLowerCase()">
+                      {{claim.status || claim.claimStatus || 'Pending'}}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customers Section -->
+      <div *ngIf="activeTab() === 'customers'" class="section">
+        <div class="section-header">
+          <h2>Customers Management</h2>
+          <p>View and manage customer information</p>
+        </div>
+        
+        <div class="table-card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let customer of customers()">
+                  <td>{{customer.customerId || customer.id}}</td>
+                  <td>{{customer.name}}</td>
+                  <td>{{customer.email}}</td>
+                  <td>{{customer.phone}}</td>
+                  <td>{{customer.address}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policies Section -->
+      <div *ngIf="activeTab() === 'policies'" class="section">
+        <div class="section-header">
+          <h2><i class="fas fa-file-contract"></i> Policies Management</h2>
+          <div class="header-actions">
+            <select [(ngModel)]="selectedPolicyType" class="filter-select">
+              <option value="">All Types</option>
+              <option value="Health">Health</option>
+              <option value="Vehicle">Vehicle</option>
+              <option value="Life">Life</option>
+              <option value="Travel">Travel</option>
+              <option value="Home">Home</option>
+            </select>
+            <button class="btn-primary" (click)="togglePolicyForm()">
+              <i class="fas fa-plus"></i>
+              Add Policy
+            </button>
+          </div>
+        </div>
+
+        <!-- Policy Form -->
+        <div *ngIf="showPolicyForm()" class="form-card">
+          <div class="form-header">
+            <h3>Create New Policy</h3>
+            <button class="close-btn" (click)="togglePolicyForm()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <form (ngSubmit)="createPolicy()" class="policy-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Policy Name</label>
+                <input [value]="policyForm().name" #nameInput (input)="updatePolicyForm('name', nameInput.value)" placeholder="Policy Name" required>
+              </div>
+              <div class="form-group">
+                <label>Policy Type</label>
+                <select [value]="policyForm().policyType" #typeSelect (change)="updatePolicyForm('policyType', typeSelect.value)" required>
+                  <option value="">Select Type</option>
+                  <option value="Health">Health</option>
+                  <option value="Vehicle">Vehicle</option>
+                  <option value="Life">Life</option>
+                  <option value="Travel">Travel</option>
+                  <option value="Home">Home</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Premium Amount</label>
+                <input [value]="policyForm().premiumAmount" #premiumInput (input)="updatePolicyForm('premiumAmount', premiumInput.value)" type="number" placeholder="Premium Amount" required>
+              </div>
+              <div class="form-group">
+                <label>Coverage Amount</label>
+                <input [value]="policyForm().coverageamount" #coverageInput (input)="updatePolicyForm('coverageamount', coverageInput.value)" type="number" placeholder="Coverage Amount" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Coverage Details</label>
+              <textarea [value]="policyForm().coverageDetails" #detailsTextarea (input)="updatePolicyForm('coverageDetails', detailsTextarea.value)" placeholder="Coverage Details" required></textarea>
+            </div>
+            
+            <div class="form-actions">
+              <button type="button" class="btn-outline" (click)="togglePolicyForm()">Cancel</button>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i>
+                Create Policy
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="table-card">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Policy ID</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Premium Amount</th>
+                  <th>Coverage Amount</th>
+                  <th>Coverage Details</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let policy of getFilteredPolicies()">
+                  <td><span class="id-badge">{{policy[1] || policy.policy_id || policy.policyId || policy.id || 'N/A'}}</span></td>
+                  <td><strong>{{policy[4] || policy.name || 'No Name'}}</strong></td>
+                  <td><span class="type-badge">{{policy.policyType || policy[5] || policy.policy_type || policy.type || 'N/A'}}</span></td>
+                  <td><span class="amount">₹{{policy[2] || policy.premium_amount || policy.premiumAmount || policy.premium || 0 | number}}</span></td>
+                  <td><span class="amount">₹{{policy[0] || policy.coverageamount || policy.coverageAmount || policy.coverage || 0 | number}}</span></td>
+                  <td class="description-cell">{{policy[3] || policy.coverage_details || policy.coverageDetails || policy.description || 'No Description'}}</td>
+                  <td>
+                    <button class="btn-danger btn-sm" (click)="deletePolicy(policy[1] || policy.policy_id || policy.policyId || policy.id)">
+                      <i class="fas fa-trash"></i>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policy Logs Section -->
+      <div *ngIf="activeTab() === 'policy-logs'" class="section">
+        <div class="section-header">
+          <h2><i class="fas fa-history"></i> Policy Logs</h2>
+          <p>View all policy transaction logs and history</p>
+        </div>
+        
+        <div class="table-card">
+          <div class="table-container">
+            <div *ngIf="policyLogs().length === 0" class="no-data-message">
+              <i class="fas fa-history"></i>
+              <p>No policy logs available</p>
+            </div>
+            <table *ngIf="policyLogs().length > 0" class="data-table professional-table">
+              <thead>
+                <tr>
+                  <th>Policy ID</th>
+                  <th>Customer ID</th>
+                  <th>Agent ID</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let log of policyLogs(); let i = index">
+                  <td><span class="simple-badge">{{log.policyId || log.policy_id || log.id || log.pId || ('P-' + (i + 1))}}</span></td>
+                  <td><span class="simple-badge">{{log.customerId || log.customer_id || log.userId || log.cId || ('C-' + (i + 1))}}</span></td>
+                  <td><span class="simple-badge">{{log.agentId || log.agent_id || log.createdBy || log.aId || ('A-' + (i + 1))}}</span></td>
+                  <td><span class="status-simple">{{log.status || log.policyStatus || 'ACTIVE'}}</span></td>
+                  <td><span class="date-simple">{{getFormattedDate(log)}}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+
+</div>

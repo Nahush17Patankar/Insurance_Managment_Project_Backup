@@ -1,0 +1,232 @@
+<div class="policy-container">
+  <!-- Header -->
+  <header class="header">
+    <nav class="navbar">
+      <div class="nav-brand">
+        <i class="fas fa-shield-alt"></i>
+        <span>SecureLife Insurance</span>
+      </div>
+      <div class="nav-menu">
+        <a (click)="navigateToHome()" style="cursor: pointer;">Home</a>
+        <a href="#policies" class="active">Policies</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn-secondary">
+          <i class="fas fa-user"></i> Profile
+        </button>
+        <button class="btn-primary">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Policy Management Section -->
+  <section class="policy-section">
+    <div class="container">
+      <div class="section-header">
+        <h1>Policy Management</h1>
+        <p>Manage your insurance policies with ease</p>
+        <div class="header-actions">
+          <button class="btn-primary" (click)="toggleAddForm()">
+            <i class="fas fa-plus"></i> Add New Policy
+          </button>
+          <button class="btn-secondary" (click)="loadPolicies()">
+            <i class="fas fa-refresh"></i> Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Section -->
+      <div class="search-section">
+        <div class="unified-search">
+          <select [(ngModel)]="searchType" class="search-select">
+            <option value="customer">Customer ID</option>
+            <option value="agent">Agent ID</option>
+            <option value="policy">Policy ID</option>
+          </select>
+          <input type="number" [(ngModel)]="searchValue" [placeholder]="'Enter ' + searchType + ' ID'" class="search-input">
+          <button class="btn-outline" (click)="search()">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Policy Form -->
+      <div class="add-policy-form" *ngIf="showAddForm">
+        <div class="form-card">
+          <h3>Add New Policy</h3>
+          <form #policyForm="ngForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Policy Name</label>
+                <input type="text" [(ngModel)]="newPolicy.name" name="name" placeholder="Enter policy name" required>
+              </div>
+              <div class="form-group">
+                <label>Premium Amount (₹)</label>
+                <input type="number" [(ngModel)]="newPolicy.premiumAmount" name="premiumAmount" placeholder="Enter premium amount" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Validity Period (Years)</label>
+                <input type="number" [(ngModel)]="newPolicy.validityPeriod" name="validityPeriod" min="1" placeholder="Enter validity period" required>
+              </div>
+              <div class="form-group">
+                <label>Customer ID</label>
+                <input type="number" [(ngModel)]="newPolicy.customerId" name="customerId" placeholder="Enter customer ID" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Agent ID</label>
+                <input type="number" [(ngModel)]="newPolicy.agentId" name="agentId" placeholder="Enter agent ID" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Coverage Details</label>
+              <textarea [(ngModel)]="newPolicy.coverageDetails" name="coverageDetails" placeholder="Enter coverage details" rows="3" required></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-primary" (click)="addPolicy()">
+                <i class="fas fa-save"></i> Save Policy
+              </button>
+              <button type="button" class="btn-secondary" (click)="resetForm()">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Edit Policy Form -->
+      <div class="add-policy-form" *ngIf="showEditForm && editingPolicy">
+        <div class="form-card">
+          <h3>Edit Policy</h3>
+          <form #editForm="ngForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Policy Name</label>
+                <input type="text" [(ngModel)]="editingPolicy.name" name="editName" placeholder="Enter policy name" required>
+              </div>
+              <div class="form-group">
+                <label>Premium Amount (₹)</label>
+                <input type="number" [(ngModel)]="editingPolicy.premiumAmount" name="editPremiumAmount" placeholder="Enter premium amount" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Validity Period (Years)</label>
+                <input type="number" [(ngModel)]="editingPolicy.validityPeriod" name="editValidityPeriod" min="1" placeholder="Enter validity period" required>
+              </div>
+              <div class="form-group">
+                <label>Customer ID</label>
+                <input type="number" [(ngModel)]="editingPolicy.customerId" name="editCustomerId" placeholder="Enter customer ID" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Agent ID</label>
+                <input type="number" [(ngModel)]="editingPolicy.agentId" name="editAgentId" placeholder="Enter agent ID" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Coverage Details</label>
+              <textarea [(ngModel)]="editingPolicy.coverageDetails" name="editCoverageDetails" placeholder="Enter coverage details" rows="3" required></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-primary" (click)="updatePolicy()">
+                <i class="fas fa-save"></i> Update Policy
+              </button>
+              <button type="button" class="btn-secondary" (click)="cancelEdit()">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Policies Grid -->
+      <div class="policies-grid">
+        <div class="policy-card" *ngFor="let policy of policies">
+          <div class="policy-header">
+            <div class="policy-icon">
+              <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="policy-info">
+              <h3>{{policy.name}}</h3>
+              <span class="policy-id">Policy ID: {{policy.policyId}}</span>
+            </div>
+            <div class="policy-actions">
+              <button class="btn-info" (click)="toggleCardDetails(policy.policyId!)">
+                <i class="fas" [class.fa-chevron-down]="!isCardExpanded(policy.policyId!)" [class.fa-chevron-up]="isCardExpanded(policy.policyId!)"></i>
+              </button>
+              <button class="btn-edit" (click)="toggleEditForm(policy)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn-danger" (click)="deletePolicy(policy.policyId!)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          <div class="policy-details">
+            <div class="detail-item">
+              <i class="fas fa-rupee-sign"></i>
+              <span class="label">Premium:</span>
+              <span class="value">₹{{policy.premiumAmount | number}}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-calendar"></i>
+              <span class="label">Validity:</span>
+              <span class="value">{{policy.validityPeriod}} Year(s)</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-user"></i>
+              <span class="label">Customer ID:</span>
+              <span class="value">{{policy.customerId}}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-user-tie"></i>
+              <span class="label">Agent ID:</span>
+              <span class="value">{{policy.agentId}}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-calendar-plus"></i>
+              <span class="label">Entry Date:</span>
+              <span class="value">{{policy.entryDate | date:'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-calendar-times"></i>
+              <span class="label">Expiry Date:</span>
+              <span class="value">{{policy.expiryDate | date:'dd/MM/yyyy'}}</span>
+            </div>
+          </div>
+          <div class="policy-coverage">
+            <h4>Coverage Details</h4>
+            <p>{{policy.coverageDetails}}</p>
+          </div>
+          
+          <!-- Expandable Details -->
+          <div class="expanded-details" *ngIf="isCardExpanded(policy.policyId!)">
+            <div class="details-row">
+              <div class="detail-item">
+                <i class="fas fa-user"></i>
+                <span class="label">Customer:</span>
+                <span class="value">ID: {{policy.customerId}} - {{cardDetails[policy.policyId!].customerName || 'Loading...'}}</span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-user-tie"></i>
+                <span class="label">Agent:</span>
+                <span class="value">ID: {{policy.agentId}} - {{cardDetails[policy.policyId!].agentName || 'Loading...'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </section>
+</div>

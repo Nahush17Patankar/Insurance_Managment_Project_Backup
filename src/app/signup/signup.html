@@ -1,0 +1,180 @@
+<div class="signup-page">
+  <!-- Notification -->
+  <div class="notification" [class.show]="showNotification" [class.success]="notificationType === 'success'" [class.error]="notificationType === 'error'">
+    <div class="notification-content">
+      <i class="fas fa-check-circle" *ngIf="notificationType === 'success'"></i>
+      <i class="fas fa-exclamation-circle" *ngIf="notificationType === 'error'"></i>
+      <span>{{notificationMessage}}</span>
+    </div>
+  </div>
+  
+  <!-- Header -->
+  <header class="signup-header">
+    <nav class="navbar">
+      <div class="nav-brand" (click)="navigateToHome()">
+        <i class="fas fa-shield-alt"></i>
+        <span>SecureLife Insurance</span>
+      </div>
+      <div class="nav-actions">
+        <button class="btn-outline" (click)="navigateToHome()">
+          <i class="fas fa-home"></i> Home
+        </button>
+        <button class="btn-secondary" (click)="navigateToLogin()">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="signup-container">
+    <div class="signup-card">
+      <div class="signup-header-content">
+        <h1>Create Your Account</h1>
+        <p>Join SecureLife Insurance and protect your future today</p>
+      </div>
+
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmitSignup()" class="signup-form">
+        <div class="form-row">
+          <div class="form-group">
+            <input 
+              type="text" 
+              placeholder="Full Name" 
+              formControlName="name" 
+              [class.error]="getFieldError('name')"
+              required 
+            />
+            <label>Full Name</label>
+            <div class="error-message" *ngIf="getFieldError('name')">
+              {{getFieldError('name')}}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <input 
+              type="email" 
+              placeholder="Email Address" 
+              formControlName="email" 
+              [class.error]="getFieldError('email')"
+              required 
+            />
+            <label>Email Address</label>
+            <div class="error-message" *ngIf="getFieldError('email')">
+              {{getFieldError('email')}}
+            </div>
+          </div>
+          <div class="form-group password-group">
+            <input 
+              [type]="showPassword ? 'text' : 'password'" 
+              placeholder="Password" 
+              formControlName="password" 
+              [class.error]="getFieldError('password')"
+              required 
+            />
+            <button type="button" class="password-toggle" (click)="togglePasswordVisibility()">
+              <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+            </button>
+            <label>Password</label>
+            <div class="error-message" *ngIf="getFieldError('password')">
+              {{getFieldError('password')}}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <select formControlName="gender" [class.error]="getFieldError('gender')" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            <label>Gender</label>
+            <div class="error-message" *ngIf="getFieldError('gender')">
+              {{getFieldError('gender')}}
+            </div>
+          </div>
+          <div class="form-group">
+            <input 
+              type="date" 
+              formControlName="date" 
+              [class.error]="getFieldError('date')"
+              required 
+            />
+            <label>Date of Birth</label>
+            <div class="error-message" *ngIf="getFieldError('date')">
+              {{getFieldError('date')}}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <input 
+              type="number" 
+              placeholder="Aadhaar Number" 
+              formControlName="aadharnumber" 
+              [class.error]="getFieldError('aadharnumber')"
+              required 
+            />
+            <label>Aadhaar Number</label>
+            <div class="error-message" *ngIf="getFieldError('aadharnumber')">
+              {{getFieldError('aadharnumber')}}
+            </div>
+          </div>
+          <div class="form-group">
+            <input 
+              type="tel" 
+              placeholder="Phone Number" 
+              formControlName="phone" 
+              [class.error]="getFieldError('phone')"
+              required 
+            />
+            <label>Phone Number</label>
+            <div class="error-message" *ngIf="getFieldError('phone')">
+              {{getFieldError('phone')}}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <textarea 
+            placeholder="Address" 
+            formControlName="address" 
+            [class.error]="getFieldError('address')"
+            required
+          ></textarea>
+          <label>Address</label>
+          <div class="error-message" *ngIf="getFieldError('address')">
+            {{getFieldError('address')}}
+          </div>
+        </div>
+
+
+
+        <button 
+          type="submit" 
+          class="signup-btn" 
+          [disabled]="signupForm.invalid || isLoading"
+          [class.loading]="isLoading"
+        >
+          <span *ngIf="!isLoading">
+            <i class="fas fa-user-plus"></i> Create Account
+          </span>
+          <span *ngIf="isLoading" class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i> Creating Account...
+          </span>
+        </button>
+      </form>
+
+      <div class="signup-footer">
+        <p>Already have an account? 
+          <button type="button" class="link-btn" (click)="navigateToLogin()">
+            Sign In
+          </button>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
