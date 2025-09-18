@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { JwtService } from '../Services/jwt.service';
@@ -10,7 +9,7 @@ import { CustomerService } from '../Services/customer.service';
 @Component({
   selector: 'app-customer',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   providers: [CustomerService],
   templateUrl: './customer.html',
   styleUrl: './customer.css'
@@ -27,7 +26,7 @@ export class Customer implements OnInit, OnDestroy {
   isPolicyLoading = false;
   isClaimLoading = false;
   isProfileLoading = false;
-  searchTerm = '';
+  searchForm: FormGroup;
   showNotification = false;
   notificationMessage = '';
   notificationType: 'success' | 'error' = 'success';
@@ -75,6 +74,10 @@ export class Customer implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       service: ['', Validators.required],
       message: ['', Validators.required]
+    });
+
+    this.searchForm = this.fb.group({
+      searchTerm: ['']
     });
   }
 
@@ -227,10 +230,11 @@ export class Customer implements OnInit, OnDestroy {
       return [];
     }
     
+    const searchValue = this.searchForm.get('searchTerm')?.value || '';
     console.log('Filtering policies:', this.policies);
     return this.policies.filter(policy => {
       const name = policy.name || policy[4] || 'No Name';
-      return name.toLowerCase().includes(this.searchTerm.toLowerCase());
+      return name.toLowerCase().includes(searchValue.toLowerCase());
     });
   }
 

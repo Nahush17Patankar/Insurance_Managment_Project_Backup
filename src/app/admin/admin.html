@@ -58,7 +58,7 @@
       <div class="navbar-center">
         <div class="search-box">
           <i class="fas fa-search"></i>
-          <input type="text" placeholder="Search..." [(ngModel)]="searchTerm">
+          <input type="text" placeholder="Search..." formControlName="searchTerm" [formGroup]="searchForm">
         </div>
       </div>
       
@@ -227,43 +227,64 @@
             </button>
           </div>
           
-          <form (ngSubmit)="createAgent()" class="agent-form">
+          <form [formGroup]="agentForm" (ngSubmit)="createAgent()" class="agent-form">
             <div class="form-grid">
               <div class="form-group">
                 <label>Name</label>
-                <input [value]="agentForm().name" (input)="onInputChange($event, 'name')" placeholder="Agent Name" required>
+                <input formControlName="name" placeholder="Agent Name" [class.error]="getFieldError(agentForm, 'name')">
+                <div class="error-message" *ngIf="getFieldError(agentForm, 'name')">
+                  {{getFieldError(agentForm, 'name')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Email</label>
-                <input [value]="agentForm().contactInfo" (input)="onInputChange($event, 'contactInfo')" type="email" placeholder="Email" required>
+                <input formControlName="contactInfo" type="email" placeholder="Email" [class.error]="getFieldError(agentForm, 'contactInfo')">
+                <div class="error-message" *ngIf="getFieldError(agentForm, 'contactInfo')">
+                  {{getFieldError(agentForm, 'contactInfo')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Password</label>
-                <input [value]="agentForm().password" (input)="onInputChange($event, 'password')" type="password" placeholder="Password" required>
+                <input formControlName="password" type="password" placeholder="Password" [class.error]="getFieldError(agentForm, 'password')">
+                <div class="error-message" *ngIf="getFieldError(agentForm, 'password')">
+                  {{getFieldError(agentForm, 'password')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Gender</label>
-                <select [value]="agentForm().gender" (change)="onInputChange($event, 'gender')">
+                <select formControlName="gender">
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Aadhar Number</label>
-                <input [value]="agentForm().aadharnumber" (input)="onInputChange($event, 'aadharnumber')" type="number" placeholder="Aadhar Number" required>
+                <input formControlName="aadharnumber" type="text" placeholder="Aadhar Number" [class.error]="getFieldError(agentForm, 'aadharnumber')">
+                <div class="error-message" *ngIf="getFieldError(agentForm, 'aadharnumber')">
+                  {{getFieldError(agentForm, 'aadharnumber')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Phone</label>
-                <input [value]="agentForm().phone" (input)="onInputChange($event, 'phone')" type="number" placeholder="Phone Number" required>
+                <input formControlName="phone" type="text" placeholder="Phone Number" [class.error]="getFieldError(agentForm, 'phone')">
+                <div class="error-message" *ngIf="getFieldError(agentForm, 'phone')">
+                  {{getFieldError(agentForm, 'phone')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Organization Email</label>
-                <input [value]="agentForm().orgEmail" (input)="onInputChange($event, 'orgEmail')" type="email" placeholder="Organization Email" required>
+                <input formControlName="orgEmail" type="email" placeholder="Organization Email" [class.error]="getFieldError(agentForm, 'orgEmail')">
+                <div class="error-message" *ngIf="getFieldError(agentForm, 'orgEmail')">
+                  {{getFieldError(agentForm, 'orgEmail')}}
+                </div>
               </div>
             </div>
             <div class="form-group">
               <label>Address</label>
-              <textarea [value]="agentForm().address" (input)="onInputChange($event, 'address')" placeholder="Address" required></textarea>
+              <textarea formControlName="address" placeholder="Address" [class.error]="getFieldError(agentForm, 'address')"></textarea>
+              <div class="error-message" *ngIf="getFieldError(agentForm, 'address')">
+                {{getFieldError(agentForm, 'address')}}
+              </div>
             </div>
             
             <div class="form-actions">
@@ -285,43 +306,64 @@
             </button>
           </div>
           
-          <form (ngSubmit)="updateAgent()" class="agent-form">
+          <form [formGroup]="updateForm" (ngSubmit)="updateAgent()" class="agent-form">
             <div class="form-grid">
               <div class="form-group">
                 <label>Name</label>
-                <input [value]="updateForm().name" (input)="onUpdateInputChange($event, 'name')" placeholder="Agent Name" required>
+                <input formControlName="name" placeholder="Agent Name" [class.error]="getFieldError(updateForm, 'name')">
+                <div class="error-message" *ngIf="getFieldError(updateForm, 'name')">
+                  {{getFieldError(updateForm, 'name')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Contact Info</label>
-                <input [value]="updateForm().contactInfo" (input)="onUpdateInputChange($event, 'contactInfo')" type="email" placeholder="Contact Info" required>
+                <input formControlName="contactInfo" type="email" placeholder="Contact Info" [class.error]="getFieldError(updateForm, 'contactInfo')">
+                <div class="error-message" *ngIf="getFieldError(updateForm, 'contactInfo')">
+                  {{getFieldError(updateForm, 'contactInfo')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Gender</label>
-                <select [value]="updateForm().gender" (change)="onUpdateInputChange($event, 'gender')">
+                <select formControlName="gender">
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Date</label>
-                <input [value]="updateForm().date" (input)="onUpdateInputChange($event, 'date')" type="datetime-local" required>
+                <input formControlName="date" type="datetime-local" [class.error]="getFieldError(updateForm, 'date')">
+                <div class="error-message" *ngIf="getFieldError(updateForm, 'date')">
+                  {{getFieldError(updateForm, 'date')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Aadhar Number</label>
-                <input [value]="updateForm().aadharnumber" (input)="onUpdateInputChange($event, 'aadharnumber')" type="number" placeholder="Aadhar Number" required>
+                <input formControlName="aadharnumber" type="text" placeholder="Aadhar Number" [class.error]="getFieldError(updateForm, 'aadharnumber')">
+                <div class="error-message" *ngIf="getFieldError(updateForm, 'aadharnumber')">
+                  {{getFieldError(updateForm, 'aadharnumber')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Phone</label>
-                <input [value]="updateForm().phone" (input)="onUpdateInputChange($event, 'phone')" type="number" placeholder="Phone Number" required>
+                <input formControlName="phone" type="text" placeholder="Phone Number" [class.error]="getFieldError(updateForm, 'phone')">
+                <div class="error-message" *ngIf="getFieldError(updateForm, 'phone')">
+                  {{getFieldError(updateForm, 'phone')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Organization Email</label>
-                <input [value]="updateForm().orgEmail" (input)="onUpdateInputChange($event, 'orgEmail')" type="email" placeholder="Organization Email" required>
+                <input formControlName="orgEmail" type="email" placeholder="Organization Email" [class.error]="getFieldError(updateForm, 'orgEmail')">
+                <div class="error-message" *ngIf="getFieldError(updateForm, 'orgEmail')">
+                  {{getFieldError(updateForm, 'orgEmail')}}
+                </div>
               </div>
             </div>
             <div class="form-group">
               <label>Address</label>
-              <textarea [value]="updateForm().address" (input)="onUpdateInputChange($event, 'address')" placeholder="Address" required></textarea>
+              <textarea formControlName="address" placeholder="Address" [class.error]="getFieldError(updateForm, 'address')"></textarea>
+              <div class="error-message" *ngIf="getFieldError(updateForm, 'address')">
+                {{getFieldError(updateForm, 'address')}}
+              </div>
             </div>
             
             <div class="form-actions">
@@ -445,7 +487,7 @@
         <div class="section-header">
           <h2><i class="fas fa-file-contract"></i> Policies Management</h2>
           <div class="header-actions">
-            <select [(ngModel)]="selectedPolicyType" class="filter-select">
+            <select [value]="selectedPolicyType()" (change)="selectedPolicyType.set($any($event.target).value)" class="filter-select">
               <option value="">All Types</option>
               <option value="Health">Health</option>
               <option value="Vehicle">Vehicle</option>
@@ -469,15 +511,18 @@
             </button>
           </div>
           
-          <form (ngSubmit)="createPolicy()" class="policy-form">
+          <form [formGroup]="policyForm" (ngSubmit)="createPolicy()" class="policy-form">
             <div class="form-grid">
               <div class="form-group">
                 <label>Policy Name</label>
-                <input [value]="policyForm().name" #nameInput (input)="updatePolicyForm('name', nameInput.value)" placeholder="Policy Name" required>
+                <input formControlName="name" placeholder="Policy Name" [class.error]="getFieldError(policyForm, 'name')">
+                <div class="error-message" *ngIf="getFieldError(policyForm, 'name')">
+                  {{getFieldError(policyForm, 'name')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Policy Type</label>
-                <select [value]="policyForm().policyType" #typeSelect (change)="updatePolicyForm('policyType', typeSelect.value)" required>
+                <select formControlName="policyType" [class.error]="getFieldError(policyForm, 'policyType')">
                   <option value="">Select Type</option>
                   <option value="Health">Health</option>
                   <option value="Vehicle">Vehicle</option>
@@ -485,19 +530,31 @@
                   <option value="Travel">Travel</option>
                   <option value="Home">Home</option>
                 </select>
+                <div class="error-message" *ngIf="getFieldError(policyForm, 'policyType')">
+                  {{getFieldError(policyForm, 'policyType')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Premium Amount</label>
-                <input [value]="policyForm().premiumAmount" #premiumInput (input)="updatePolicyForm('premiumAmount', premiumInput.value)" type="number" placeholder="Premium Amount" required>
+                <input formControlName="premiumAmount" type="number" placeholder="Premium Amount" [class.error]="getFieldError(policyForm, 'premiumAmount')">
+                <div class="error-message" *ngIf="getFieldError(policyForm, 'premiumAmount')">
+                  {{getFieldError(policyForm, 'premiumAmount')}}
+                </div>
               </div>
               <div class="form-group">
                 <label>Coverage Amount</label>
-                <input [value]="policyForm().coverageamount" #coverageInput (input)="updatePolicyForm('coverageamount', coverageInput.value)" type="number" placeholder="Coverage Amount" required>
+                <input formControlName="coverageamount" type="number" placeholder="Coverage Amount" [class.error]="getFieldError(policyForm, 'coverageamount')">
+                <div class="error-message" *ngIf="getFieldError(policyForm, 'coverageamount')">
+                  {{getFieldError(policyForm, 'coverageamount')}}
+                </div>
               </div>
             </div>
             <div class="form-group">
               <label>Coverage Details</label>
-              <textarea [value]="policyForm().coverageDetails" #detailsTextarea (input)="updatePolicyForm('coverageDetails', detailsTextarea.value)" placeholder="Coverage Details" required></textarea>
+              <textarea formControlName="coverageDetails" placeholder="Coverage Details" [class.error]="getFieldError(policyForm, 'coverageDetails')"></textarea>
+              <div class="error-message" *ngIf="getFieldError(policyForm, 'coverageDetails')">
+                {{getFieldError(policyForm, 'coverageDetails')}}
+              </div>
             </div>
             
             <div class="form-actions">

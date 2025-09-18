@@ -1,18 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { JwtService } from '../Services/jwt.service';
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
-  email = '';
-  password = '';
+  loginForm: FormGroup;
   showPassword = false;
   isLoading = false;
   showNotification = false;
@@ -21,17 +20,22 @@ export class Login {
   loginType = ''; // 'customer' or 'agent'
   showForm = false;
 
-  constructor(private router: Router, private http: HttpClient, private jwtService: JwtService) {}
+  constructor(
+    private router: Router, 
+    private http: HttpClient, 
+    private jwtService: JwtService,
+    private fb: FormBuilder
+  ) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
 
   onLogin() {
-    // Validate inputs
-    if (!this.email || !this.password) {
-      this.showNotificationMessage('Please enter email and password', 'error');
-      return;
-    }
-
-    if (this.email.trim() === '' || this.password.trim() === '') {
-      this.showNotificationMessage('Fields cannot be empty', 'error');
+    if (this.loginForm.invalid) {
+      this.showNotificationMessage('Please enter valid email and password', 'error');
+      this.loginForm.markAllAsTouched();
       return;
     }
 
@@ -42,8 +46,8 @@ export class Login {
     localStorage.removeItem('jwt');
 
     const loginData = {
-      email: this.email.trim(),
-      password: this.password.trim(),
+      email: this.loginForm.get('email')?.value.trim(),
+      password: this.loginForm.get('password')?.value.trim(),
     };
 
     console.log('Sending login data:', { email: loginData.email, password: '***' });
@@ -115,11 +119,23 @@ export class Login {
   goToCustomerLogin() {
     this.loginType = 'customer';
     this.showForm = true;
+    this.loginForm.reset();
   }
 
   goToAgentLogin() {
     this.loginType = 'agent';
     this.showForm = true;
+    this.loginForm.reset();
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.loginForm.get(fieldName);
+    if (field?.errors && field.touched) {
+      if (field.errors['required']) return `${fieldName} is required`;
+      if (field.errors['email']) return 'Please enter a valid email';
+      if (field.errors['minlength']) return 'Password must be at least 6 characters';
+    }
+    return '';
   }
 
   showNotificationMessage(message: string, type: 'success' | 'error') {
